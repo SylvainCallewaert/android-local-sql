@@ -9,8 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import java.sql.SQLDataException;
+import android.app.ActionBar;
 
 import fr.sm.database.DatabaseHandler;
 
@@ -20,6 +19,12 @@ public class FormActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
+        //création d'une barre d'action retour
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
     }
 
     public void onValid(View v){
@@ -47,5 +52,9 @@ public class FormActivity extends AppCompatActivity {
             isMessage = "Erreur insertion";
         }
         Toast.makeText(this, isMessage, Toast.LENGTH_LONG).show();
+        //on efface les zones de saisies
+        ((EditText) findViewById(R.id.editTextNom)).setText("");
+        ((EditText) findViewById(R.id.editTextPrenom)).setText("");
+        ((EditText) findViewById(R.id.editTextEmail)).setText("");
     }
 }
