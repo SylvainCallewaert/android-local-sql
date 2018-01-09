@@ -41,10 +41,11 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = db.getReadableDatabase().rawQuery("SELECT name, first_name, email FROM contacts", null);
         //Instanciation de la liste qui recevra les données
         List<Map<String,String>> contactList = new ArrayList<>();
-        Map<String,String> contactCols = new HashMap<>();
+
 
         //Parcourir les résultats de la requête (parcours du curseur)
         while (cursor.moveToNext()){
+            Map<String,String> contactCols = new HashMap<>();
             //Remplissage du tableau associatif en fonction des données du curseur
             contactCols.put("name",cursor.getString(0));
             contactCols.put("first_name",cursor.getString(1));
