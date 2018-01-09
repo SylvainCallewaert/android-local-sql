@@ -73,10 +73,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 this.deleteSelectedContact();
                 break;
             case R.id.mainMenuOptionEdit:
-
+                this.editSelectedContact();
                 break;
         }
         return true;
+    }
+    private void editSelectedContact(){
+        if (selectedIndex != null) {
+
+            //Création d'une intention
+            Intent FormIntent = new Intent(this, FormActivity.class);
+            //Passage des paramètres à l'intention
+            FormIntent.putExtra("id",selectedPerson.get("id"));
+            FormIntent.putExtra("first_name",selectedPerson.get("first_name"));
+            FormIntent.putExtra("name",selectedPerson.get("name"));
+            FormIntent.putExtra("email",selectedPerson.get("email"));
+            //Lancement de l'activité FormActivity
+            startActivityForResult(FormIntent,1);
+        }
+        else {
+            Toast.makeText(this,
+                    "Veuillez selectionner une contact",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == RESULT_OK){
+            Toast.makeText(this, "Mise à jour effectuée", Toast.LENGTH_SHORT).show();
+            //Reinitialisation de l'affichage de la liste
+            this.contactListInit();
+        }
     }
 
     /**
@@ -154,6 +182,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
         this.selectedIndex = position;
         this.selectedPerson = contactList.get(position);
-        Toast.makeText(this, "Ligne "+ position + "cliquée", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Ligne "+ position + " cliquée", Toast.LENGTH_SHORT).show();
     }
 }
