@@ -2,6 +2,7 @@ package sm.fr.localsqlapp;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -32,6 +33,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //référence au widget ListView sur le layout
         contactListView = findViewById(R.id.contactListView);
+        contactListInit();
+
+    }
+
+    private void contactListInit() {
         //récupération de la liste des contacts
         contactList = this.getAllContacts();
         //Création d'un contactArrayAdapter
@@ -39,10 +45,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Définition de l'adapter de notre listView
         contactListView.setAdapter(contactAdapter);
 
-        //Définition d'un écouteur
+        //Définition d'un écouteur d'évenement pour OnItemSelectedListener
         contactListView.setOnItemClickListener(this);
-
     }
+
 
     /**
      * Création du menu d'option
@@ -64,11 +70,45 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mainMenuItemDelete:
+                this.deleteSelectedContact();
                 break;
             case R.id.mainMenuOptionEdit:
+
                 break;
         }
         return true;
+    }
+
+    /**
+     * Suppression du contact selectionné
+     */
+    private void deleteSelectedContact(){
+        //supprimer uniquement si un contact est selectionné
+        if (selectedIndex != null){
+
+            try {
+                //Définition de la requête sql et des paramètres
+                String sql = "DELETE FROM contacts WHERE id=?";
+                String[] params = {this.selectedPerson.get("id")};
+                //Exécution de la requëte
+                DatabaseHandler db = new DatabaseHandler(this);
+                db.getWritableDatabase().execSQL(sql, params);
+                //Réinitialisation de la liste des contacts
+                this.contactList = this.getAllContacts();
+                this.contactListInit();
+            }
+            catch(SQLiteException ex){
+                Toast.makeText(this,
+                        "Impossible de supprimer",
+                        Toast.LENGTH_LONG).show();
+            }
+
+        }else {
+            Toast.makeText(this,
+                    "Veuillez selectionner une contact",
+                    Toast.LENGTH_LONG).show();
+        }
+
     }
 
     /**
@@ -88,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Instanciation de la connexion à la base de données
         DatabaseHandler db = new DatabaseHandler(this);
         //Exécute une requete de sélection
-        Cursor cursor = db.getReadableDatabase().rawQuery("SELECT name, first_name, email FROM contacts", null);
+        Cursor cursor = db.getReadableDatabase().rawQuery("SELECT name, first_name, email,id FROM contacts", null);
         //Instanciation de la liste qui recevra les données
         List<Map<String,String>> contactList = new ArrayList<>();
 
@@ -100,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             contactCols.put("name",cursor.getString(0));
             contactCols.put("first_name",cursor.getString(1));
             contactCols.put("email",cursor.getString(2));
+            contactCols.put("id",cursor.getString(3));
 
             //Ajout du map à la liste
             contactList.add(contactCols);
