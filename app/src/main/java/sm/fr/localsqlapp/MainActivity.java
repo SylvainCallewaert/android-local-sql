@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         contactListView = findViewById(R.id.contactListView);
         contactListInit();
 
-        this.testDAO();
+
 
         //Récupération des données persistées dans le Bundle
         if (savedInstanceState != null){
@@ -63,18 +63,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private void testDAO() {
-        try {
-            ContactDAO dao = new ContactDAO(new DatabaseHandler(this));
-            Contact contact = dao.findOneById(1);
-            if (contact.getName() == null){
-                Log.i("DAO", "Contact inconnu");
-            } else
-            Log.i("DAO", contact.getName());
-        } catch (SQLiteException ex){
-            Log.i("DEBUG", ex.getMessage());
-        }
-    }
 
     private void contactListInit() {
         //récupération de la liste des contacts
@@ -191,32 +179,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
     }
-    //récupérer les enregistrements de la base de données contacts
-    private List<Map<String,String>> getAllContacts(){
-        //Instanciation de la connexion à la base de données
-        DatabaseHandler db = new DatabaseHandler(this);
-        //Exécute une requete de sélection
-        Cursor cursor = db.getReadableDatabase().rawQuery("SELECT name, first_name, email,id FROM contacts", null);
-        //Instanciation de la liste qui recevra les données
-        List<Map<String,String>> contactList = new ArrayList<>();
 
-
-        //Parcourir les résultats de la requête (parcours du curseur)
-        while (cursor.moveToNext()){
-            Map<String,String> contactCols = new HashMap<>();
-            //Remplissage du tableau associatif en fonction des données du curseur
-            contactCols.put("name",cursor.getString(0));
-            contactCols.put("first_name",cursor.getString(1));
-            contactCols.put("email",cursor.getString(2));
-            contactCols.put("id",cursor.getString(3));
-
-            //Ajout du map à la liste
-            contactList.add(contactCols);
-        }
-
-
-        return contactList;
-    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
