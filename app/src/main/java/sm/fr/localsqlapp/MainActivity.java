@@ -144,14 +144,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (selectedIndex != null){
 
             try {
-                //Définition de la requête sql et des paramètres
-                String sql = "DELETE FROM contacts WHERE id=?";
-                String[] params = {String.valueOf(this.selectedPerson.getId())};
-                //Exécution de la requëte
-                DatabaseHandler db = new DatabaseHandler(this);
-                db.getWritableDatabase().execSQL(sql, params);
-                //Réinitialisation de la liste des contacts
-                this.contactListInit();
+                this.dao.deleteOneById(Long.valueOf(this.selectedIndex));
             }
             catch(SQLiteException ex){
                 Toast.makeText(this,
