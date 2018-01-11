@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
+
         //Récupération des données persistées dans le Bundle
         if (savedInstanceState != null){
             this.selectedIndex = savedInstanceState.getInt("selectedIndex");
