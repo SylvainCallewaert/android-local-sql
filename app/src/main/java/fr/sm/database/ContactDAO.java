@@ -1,5 +1,6 @@
 package fr.sm.database;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 import sm.fr.localsqlapp.model.Contact;
 
-public class ContactDAO {
+public class ContactDAO implements DAOInterface<Contact> {
 
     private DatabaseHandler db;
 
@@ -18,10 +19,12 @@ public class ContactDAO {
 
     /**
      * Récupération d'un contact en fonction de sa clé primaire (id)
+     *
      * @param id
      * @return
      */
-    public Contact findOneById(int id) throws SQLiteException{
+    @Override
+    public Contact findOneById(int id) throws SQLiteException {
         //Exécution de la requête
         String[] params = {String.valueOf(id)};
         String sql = "SELECT * FROM contact WHERE id=?";
@@ -50,10 +53,10 @@ public class ContactDAO {
     }
 
     /**
-     *
      * @return
      */
-    public List<Contact> findAll() throws SQLiteException{
+    @Override
+    public List<Contact> findAll() throws SQLiteException {
         //Instanciation de la liste des contacts
         List<Contact> contactList = new ArrayList<>();
 
@@ -61,7 +64,7 @@ public class ContactDAO {
         String sql = "SELECT id, name, first_name,email FROM contacts";
         Cursor cursor = this.db.getReadableDatabase().rawQuery(sql, null);
         //Boucle sur le curseur pour parcourir l'ensemble des résultats de ma requête
-        while(cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             contactList.add(this.hydrateContact(cursor));
         }
 
@@ -73,13 +76,46 @@ public class ContactDAO {
 
     /**
      * Suppression d'un contact en fonction de sa clef primaire
+     *
      * @param id
      * @throws SQLiteException
      */
-    public void deleteOneById(Long id)throws SQLiteException{
+    @Override
+    public void deleteOneById(Long id) throws SQLiteException {
         String[] params = {id.toString()};
         String sql = "DELETE FROM contacts WHERE id =?";
         this.db.getWritableDatabase().execSQL(sql, params);
+    }
 
+    @Override
+    public void persist(Contact entity) {
+        if (entity.getId() == null) {
+            this.insert(entity);
+        } else {
+            this.update(entity);
+        }
+    }
+
+    private ContentValues getContentValuesFromEntity(Contact entity) {
+        ContentValues values = new ContentValues();
+        values.put("name", entity.getName());
+        values.put("first_name", entity.getFirst_name());
+        values.put("email", entity.getEmail());
+
+        return values;
+    }
+
+    private void insert(Contact entity){
+        Long id = this.db.getWritableDatabase().insert("contacts",
+                null,
+                this.getContentValuesFromEntity(entity));
+        entity.setId(id);
+    }
+    private void update(Contact entity){
+        String[] params = {entity.getId().toString()};
+        this.db.getWritableDatabase().update("contact",
+                this.getContentValuesFromEntity(entity),
+                "id=?",
+                params);
     }
 }

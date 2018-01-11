@@ -144,7 +144,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (selectedIndex != null){
 
             try {
-                this.dao.deleteOneById(Long.valueOf(this.selectedIndex));
+                Long id = this.selectedPerson.getId();
+                //On appel la méthode delete deleteOneById de la DAO
+                this.dao.deleteOneById(Long.valueOf(id));
+                //Réinicialisation de la liste de contacts
+                this.contactListInit();
             }
             catch(SQLiteException ex){
                 Toast.makeText(this,
